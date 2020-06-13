@@ -1,7 +1,35 @@
 import 'package:technicalsand/article.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+const String _site = 'https://technicalsand.com';
+const String _params = '/wp-json/wp/v2/posts?_fields=id,excerpt,title,link,jetpack_featured_media_url';
 
 class ArticleEngine {
   int _articleNumber = 0;
+
+  Future<List<Article>> getPosts(int page) async {
+    var url = _site + _params + '&per_page=30';
+    print('Hitting page: $url');
+    var client = http.Client();
+    try {
+      var response = await client.get(url);
+      print(response.body);
+      final list = jsonDecode(response.body.toString());
+
+      List<Article> articles = new List();
+
+      for (final art in list) {
+        articles.add( Article.fromJson(art, response.headers));
+
+      }
+      return articles;
+    } finally {
+      client.close();
+    }
+  }
+
+
   List<Article> articles = [
     Article(
         id: 1,

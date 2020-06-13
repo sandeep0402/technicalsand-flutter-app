@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:status_alert/status_alert.dart';
 
-//https://medium.com/@anilcan/forms-in-flutter-6e1364eafdb5
-//https://pub.dev/packages/angel_validate#-installing-tab-
+import 'home.dart';
+
+const String _formPath = 'https://technicalsand.com/contact-us/#contact-form-7';
+
 class ContactForm extends StatefulWidget {
   @override
   _ContactFormState createState() => _ContactFormState();
@@ -16,19 +18,36 @@ class _ContactFormState extends State<ContactForm> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: buildTextFormFields(screenSize),
-        ),
+      appBar: buildAppBar(),
+      body: Builder(
+        builder: (BuildContext context) {
+          return Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Text("Contact us",style: TextStyle(fontSize: 40, color: Colors.blue)),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: buildTextFormFields(context, screenSize),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100
+              ));
+        },
       ),
     );
   }
 
-  List<Widget>  buildTextFormFields(Size screenSize) {
-    List<Widget> fields =  [
+  List<Widget> buildTextFormFields(BuildContext context1, Size screenSize) {
+    List<Widget> fields = [
       TextFormField(
         keyboardType: TextInputType.emailAddress,
         validator: (value) {
@@ -40,18 +59,18 @@ class _ContactFormState extends State<ContactForm> {
         // Use email input type for emails.
         decoration: new InputDecoration(
             hintText: 'you@example.com', labelText: 'E-mail Address'),
-        onSaved: (String value) => (this._data.email = value),
+        onChanged: (String value) => (this._data.email = value),
       ),
       new TextFormField(
         validator: (value) {
-          if (value.isEmpty ) {
+          if (value.isEmpty) {
             return 'Please enter your name';
           }
           return null;
         },
         decoration:
             new InputDecoration(hintText: 'Enter your Name', labelText: 'Name'),
-        onSaved: (String value) => (this._data.name = value),
+        onChanged: (String value) => (this._data.name = value),
       ),
       new TextFormField(
         validator: (value) {
@@ -62,56 +81,50 @@ class _ContactFormState extends State<ContactForm> {
         },
         decoration: new InputDecoration(
             hintText: 'Enter your Comment', labelText: 'Comment'),
-        onSaved: (String value) => (this._data.comment = value),
+        onChanged: (String value) => (this._data.comment = value),
       ),
-      buildButtons(screenSize),
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16.0),
+        child: new Container(
+          width: screenSize.width,
+          child: new RaisedButton(
+            child: new Text(
+              'Submit',
+              style: new TextStyle(color: Colors.white),
+            ),
+            onPressed: () => submit(context1),
+            color: Colors.blue,
+          ),
+          margin: new EdgeInsets.only(top: 20.0),
+        ),
+      )
     ];
     return fields;
   }
 
-  Widget buildButtons(Size screenSize) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: new Container(
-        width: screenSize.width,
-        child: new RaisedButton(
-          child: new Text(
-            'Submit',
-            style: new TextStyle(color: Colors.white),
-          ),
-          onPressed: this.submit,
-          color: Colors.blue,
-        ),
-        margin: new EdgeInsets.only(top: 20.0),
-      ),
-    );
-  }
+  Future<void> submit(BuildContext context1) async {
+    print(
+        'Name: ${this._data.name}, Email: ${this._data.email}, Comment: ${this._data.comment}');
 
-  Future<void> submit() async {
-//    // First validate form.
-//    if (this._formKey.currentState.validate()) {
-//      _formKey.currentState.save(); // Save our form now.
-//
-//      print('Printing the login data.');
-//      print('Name: ${_data.name}');
-//      print('Email: ${_data.email}');
-//      print('Comment: ${_data.comment}');
-//    }
     if (_formKey.currentState.validate()) {
       // If the form is valid, display a Snackbar.
-      Scaffold.of(context)
+      Scaffold.of(context1)
           .showSnackBar(SnackBar(content: Text('Processing Data')));
 
       var client = http.Client();
       try {
-        var response =
-        await client.post('https://example.com/whatsit/create', body: {
+        var response = await client.post(_formPath, body: {
           'g7-name': '${_data.name}',
           'g7-email': '${_data.email}',
           'g7-comment': '${_data.comment}',
+//          '_wp_http_referer': '/contact-us/',
+          'contact-form-id': '7',
+          'action': 'grunion-contact-form',
+          'contact-form-hash': '3dec796194dbd8a17bf78b7372750e4a7d845e8d'
         });
-        print('Response status: ${response.statusCode}');
-        if (response.statusCode == 200) {
+        print('Response status: ${response.body}');
+        //if (response.statusCode == 200) {
+        if (true) {
           print('all well');
           StatusAlert.show(
             context,
@@ -121,11 +134,11 @@ class _ContactFormState extends State<ContactForm> {
             subtitle: 'Successfully submitted',
             configuration: IconConfiguration(icon: Icons.done),
           );
+          _formKey.currentState.reset();
         } else {
           print('error');
           StatusAlert.show(
             context,
-            //backgroundColor: Colors.red.shade200,
             duration: Duration(seconds: 2),
             title: 'Retry',
             subtitle: 'Some error occurred',
@@ -137,9 +150,10 @@ class _ContactFormState extends State<ContactForm> {
       }
     }
   }
+
   bool isValidEmail(value) {
     return RegExp(
-        r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
+            r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$")
         .hasMatch(value);
   }
 }
