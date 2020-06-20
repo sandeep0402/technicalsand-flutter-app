@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:swipe_gesture_recognizer/swipe_gesture_recognizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -111,19 +112,25 @@ class _PagerState extends State<Pager> {
                           children: getPostsLayout(position),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: getSwipeUpDownButtons(
-                              position, randomWordList.length),
+                      ClipPath(
+                        clipper: WaveClipperTwo(reverse: true),
+                        child: Container(
+                          height: 80,
+                          color: Colors.teal,
+                          padding: const EdgeInsets.only(bottom: 10.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: getSwipeUpDownButtons(
+                                position, randomWordList.length),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  decoration: BoxDecoration(
-                    gradient: gradients[position % gradients.length],
-                  ),
+//                  decoration: BoxDecoration(
+//                    gradient: gradients[position % gradients.length],
+//                  ),
                 ),
               ),
             ],
@@ -149,8 +156,8 @@ class _PagerState extends State<Pager> {
                 removeAllHtmlTags(randomWordList[position].title, false),
                 overflow: TextOverflow.visible,
                 style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 30.0,
+                    //color: Colors.white,
+                    fontSize: 25.0,
                     fontWeight: FontWeight.bold),
               ),
             ),
@@ -158,11 +165,15 @@ class _PagerState extends State<Pager> {
               onTap: () {
                 fetchArticles();
               },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
+              child: Card(
                 child: Image.network(
                   randomWordList[position].imageUrl,
                 ),
+                elevation: 30.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                clipBehavior: Clip.antiAlias,
               ),
             )
           ],
@@ -173,7 +184,7 @@ class _PagerState extends State<Pager> {
         child: AutoSizeText(
           removeAllHtmlTags(randomWordList[position].description, true),
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black54,
             fontSize: 18.0,
           ),
         ),
@@ -382,9 +393,11 @@ class _myWebViewState extends State<myWebView> {
   }
 
   String getJavascriptToRun() {
-    var string = "document.getElementById('page-wrapper').style.display='none';";
+    var string =
+        "document.getElementById('page-wrapper').style.display='none';";
     string += "document.getElementById('secondary').style.display='none';";
-    string += "document.getElementsByClassName('breadcrumb-wrapper')[0].style.display='none';";
+    string +=
+        "document.getElementsByClassName('breadcrumb-wrapper')[0].style.display='none';";
     return string;
   }
 }
