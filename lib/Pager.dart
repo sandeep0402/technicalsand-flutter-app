@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +40,7 @@ class _PagerState extends State<Pager> {
     articlesFuture.then((articles) => setState(() {
           randomWordList.addAll(articles);
           dataLoaded = true;
+          print('records loaded');
         }));
   }
 
@@ -75,7 +78,7 @@ class _PagerState extends State<Pager> {
               ),
               Text(
                 "Downloading Content. Please wait...",
-                style: TextStyle(fontSize: 20, color: Colors.blue),
+                style: TextStyle(fontSize: 12, color: Colors.blue),
               ),
             ],
           ),
@@ -306,60 +309,82 @@ class myWebView extends StatefulWidget {
 }
 
 class _myWebViewState extends State<myWebView> {
+  final Completer<WebViewController> _controller =
+      Completer<WebViewController>();
+  WebViewController _webViewController;
+
   var _url;
-  num _stackToView = 1;
+  var showLoader = true;
 
   _myWebViewState(this._url);
 
   void _handleLoad(String value) {
     setState(() {
-      _stackToView = 0;
+      showLoader = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
-        body: IndexedStack(
-          index: _stackToView,
-          children: <Widget>[
-            Expanded(
-              child: WebView(
-                javascriptMode: JavascriptMode.unrestricted,
-                initialUrl: _url,
-                onPageFinished: _handleLoad,
-              ),
-            ),
-            Container(
-              color: Colors.white,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Text(
-                      'Please wait...',
-                      style: TextStyle(
-                          color: Colors.lightBlue,
-                          fontSize: 30.0,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    SpinKitCubeGrid(
-                      color: Colors.blue,
-                      size: 150,
-                    ),
-                    Text(
-                      'Technicalsand.com',
-                      style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 30.0,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          ],
-        ));
+      appBar: AppBar(),
+      body: Stack(
+        children: <Widget>[
+          buildWebView(),
+          showLoader ? buildWebViewLoader() : SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget buildWebViewLoader() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Text(
+            'Please wait...',
+            style: TextStyle(
+                color: Colors.lightBlue,
+                fontSize: 15.0,
+                fontWeight: FontWeight.bold),
+          ),
+          SpinKitCubeGrid(
+            color: Colors.blue,
+            size: 50,
+          ),
+          Text(
+            'Technicalsand.com',
+            style: TextStyle(
+                color: Colors.grey,
+                fontSize: 15.0,
+                fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  WebView buildWebView() {
+    return WebView(
+      javascriptMode: JavascriptMode.unrestricted,
+      initialUrl: _url,
+      onPageFinished: (url) {
+        setState(() {
+          showLoader = false;
+        });
+        _webViewController.evaluateJavascript(getJavascriptToRun());
+      },
+      onWebViewCreated: (WebViewController webViewController) {
+        _webViewController = webViewController;
+      },
+    );
+  }
+
+  String getJavascriptToRun() {
+    var string = "document.getElementById('page-wrapper').style.display='none';";
+    string += "document.getElementById('secondary').style.display='none';";
+    string += "document.getElementsByClassName('breadcrumb-wrapper')[0].style.display='none';";
+    return string;
   }
 }

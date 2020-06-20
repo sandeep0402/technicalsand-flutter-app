@@ -26,6 +26,7 @@ class ArticleEngine {
       return articles;
     } finally {
       client.close();
+      print('url hit complete');
     }
   }
 

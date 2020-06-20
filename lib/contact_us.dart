@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:status_alert/status_alert.dart';
 
-import 'home.dart';
-
 const String _formPath = 'https://technicalsand.com/contact-us/#contact-form-7';
 
 class ContactForm extends StatefulWidget {
@@ -17,18 +15,31 @@ class _ContactFormState extends State<ContactForm> {
 
   @override
   Widget build(BuildContext context) {
+    if(_formKey.currentState != null) {
+      _formKey.currentState.reset();
+    }
+    Color hexToColor(String code) {
+      return new Color(int.parse(code.substring(1, 7), radix: 16) + 0xFF000000);
+    }
+
     final Size screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
-      appBar: buildAppBar(),
+      //appBar: buildAppBar(),
       body: Builder(
         builder: (BuildContext context) {
           return Container(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Text("Contact us",style: TextStyle(fontSize: 40, color: Colors.blue)),
+                  new Padding(padding: EdgeInsets.only(top: 10.0)),
+                  new Text(
+                    'Contact us',
+                    style: new TextStyle(
+                        color: hexToColor("#F2A03D"), fontSize: 25.0),
+                  ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -38,9 +49,7 @@ class _ContactFormState extends State<ContactForm> {
                   ),
                 ],
               ),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100
-              ));
+              decoration: BoxDecoration(color: Colors.grey.shade100));
         },
       ),
     );
@@ -58,9 +67,17 @@ class _ContactFormState extends State<ContactForm> {
         },
         // Use email input type for emails.
         decoration: new InputDecoration(
-            hintText: 'you@example.com', labelText: 'E-mail Address'),
+          hintText: 'you@example.com',
+          labelText: 'E-mail Address',
+          border: new OutlineInputBorder(
+            borderRadius: new BorderRadius.circular(50.0),
+            borderSide: new BorderSide(),
+          ),
+        ),
+
         onChanged: (String value) => (this._data.email = value),
       ),
+      SizedBox(height: 24,),
       new TextFormField(
         validator: (value) {
           if (value.isEmpty) {
@@ -68,11 +85,20 @@ class _ContactFormState extends State<ContactForm> {
           }
           return null;
         },
-        decoration:
-            new InputDecoration(hintText: 'Enter your Name', labelText: 'Name'),
+        decoration: new InputDecoration(
+          hintText: 'Enter your Name',
+          labelText: 'Name',
+          border: new OutlineInputBorder(
+            borderRadius: new BorderRadius.circular(50.0),
+            borderSide: new BorderSide(),
+          ),
+        ),
         onChanged: (String value) => (this._data.name = value),
       ),
+      SizedBox(height: 24,),
       new TextFormField(
+        maxLines: null,
+        keyboardType: TextInputType.multiline,
         validator: (value) {
           if (value.isEmpty) {
             return 'Please enter comments';
@@ -80,7 +106,13 @@ class _ContactFormState extends State<ContactForm> {
           return null;
         },
         decoration: new InputDecoration(
-            hintText: 'Enter your Comment', labelText: 'Comment'),
+          hintText: 'Enter your Comment',
+          labelText: 'Comment',
+          border: new OutlineInputBorder(
+            borderRadius: new BorderRadius.circular(50.0),
+            borderSide: new BorderSide(),
+          ),
+        ),
         onChanged: (String value) => (this._data.comment = value),
       ),
       Padding(

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:drawerbehavior/drawerbehavior.dart';
 
 import 'Pager.dart';
+import 'app_bar.dart';
 import 'contact_us.dart';
 
-const String _title = 'Technicalsand.com';
 
 class Home extends StatelessWidget {
   @override
@@ -59,17 +59,5 @@ Drawer myDrawer({@required BuildContext context, bool isHomePage}) {
         ),
       ],
     ),
-  );
-}
-
-AppBar buildAppBar() {
-  return AppBar(
-    centerTitle: true,
-    title: const Text(
-      _title,
-      style: TextStyle(color: Colors.white),
-    ),
-    elevation: 0.0,
-    backgroundColor: Colors.black,
   );
 }
