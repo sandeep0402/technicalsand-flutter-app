@@ -1,12 +1,13 @@
-# technicalsand
+# Mobile app built with flutter & Dart
+For learning purpose i have create flutter app for my blog https://technicalsand.com, Using single source code i have built ios and android app.
 
-technicalsand
+## App Preview
+![](App-preview.gif)
 
-## Getting Started
+## Flutter
+Flutter is Google’s UI toolkit for building beautiful, natively compiled applications for mobile, web, and desktop from a single codebase.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
+This project is a starting point for a Flutter application. A few resources to get you started if this is your first Flutter project:
 
 - [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
 - [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
